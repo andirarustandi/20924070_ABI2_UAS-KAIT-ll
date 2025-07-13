@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arip Software - Service & Laptop Terbaik</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(37,99,235,0.9) 0%, rgba(30,64,175,0.9) 100%);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .cart {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .cart.active {
+            max-height: 500px;
+        }
+        
+        .payment-modal {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .payment-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-2">
+                    <i class="fas fa-laptop text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-600">Arip Software</h1>
+            </div>
+            
+            <nav class="hidden md:flex space-x-6">
+                <a href="#home" onclick="smoothScroll('home')" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+                <a href="#services" onclick="smoothScroll('services')" class="text-gray-700 hover:text-blue-600 font-medium">Layanan</a>
+                <a href="#products" onclick="smoothScroll('products')" class="text-gray-700 hover:text-blue-600 font-medium">Produk</a>
+                <a href="#testimonials" onclick="smoothScroll('testimonials')" class="text-gray-700 hover:text-blue-600 font-medium">Testimoni</a>
+                <a href="#contact" onclick="smoothScroll('contact')" class="text-gray-700 hover:text-blue-600 font-medium">Kontak</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <button id="cart-toggle" class="relative p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+                
+                <button class="md:hidden" id="menu-toggle">
+                    <i class="fas fa-bars text-gray-700 text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden bg-white shadow-lg hidden" id="mobile-menu">
+            <div class="px-4 py-3 flex flex-col space-y-3">
+                <a href="#home" onclick="smoothScroll('home')" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+                <a href="#services" onclick="smoothScroll('services')" class="text-gray-700 hover:text-blue-600 font-medium">Layanan</a>
+                <a href="#products" onclick="smoothScroll('products')" class="text-gray-700 hover:text-blue-600 font-medium">Produk</a>
+                <a href="#testimonials" onclick="smoothScroll('testimonials')" class="text-gray-700 hover:text-blue-600 font-medium">Testimoni</a>
+                <a href="#contact" onclick="smoothScroll('contact')" class="text-gray-700 hover:text-blue-600 font-medium">Kontak</a>
+            </div>
+        </div>
+        
+        <!-- Cart Dropdown -->
+        <div class="cart absolute right-0 left-0 bg-white shadow-lg mx-4 mt-1 rounded-md" id="cart-dropdown">
+            <div class="p-4">
+                <h3 class="font-bold text-lg mb-3">Keranjang Belanja</h3>
+                <div id="cart-items" class="divide-y"></div>
+                <div class="flex justify-between items-center mt-4 pt-3 border-t">
+                    <span class="font-bold">Total:</span>
+                    <span id="cart-total" class="font-bold text-blue-600">Rp0</span>
+                </div>
+                <button id="checkout-btn" class="w-full mt-3 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">Checkout</button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient text-white py-16 md:py-20">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-8 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Service Elektronik & Laptop Berkualitas</h1>
+                <p class="text-lg mb-6 opacity-90">Melayani berbagai jasa service dan menyediakan laptop berkualitas dengan harga terbaik. Kami siap membantu kebutuhan teknologi Anda.</p>
+                <div class="flex space-x-3">
+                    <a href="#services" onclick="smoothScroll('services')" class="bg-white text-blue-600 px-6 py-3 rounded-md font-medium hover:bg-opacity-90 transition">Lihat Layanan</a>
+                    <a href="#products" onclick="smoothScroll('products')" class="border-2 border-white text-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-blue-600 transition">Lihat Produk</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8988eb6c-1d62-4713-b3e1-f800278f2fb0.png" alt="Teknisi profesional sedang melakukan service laptop di workshop modern dengan peralatan lengkap" class="rounded-lg shadow-xl">
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section id="services" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Layanan Kami</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Kami menyediakan berbagai layanan service elektronik dengan teknisi profesional dan peralatan lengkap.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Service 1 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-fan text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Service Kipas Pendingin</h3>
+                    <p class="text-gray-600">Perbaikan dan perawatan kipas pendingin laptop/PC untuk mengatasi overheating dan suara berisik.</p>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-microchip text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Service Motherboard</h3>
+                    <p class="text-gray-600">Diagnosa dan perbaikan motherboard, termasuk masalah power, BIOS, dan komponen lainnya.</p>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-battery-three-quarters text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Service Baterai</h3>
+                    <p class="text-gray-600">Perbaikan baterai laptop yang cepat habis atau tidak bisa charge, termasuk penggantian battery cell.</p>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-tv text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Service Layar</h3>
+                    <p class="text-gray-600">Penggantian dan perbaikan layar laptop yang rusak, bergaris, atau blank display.</p>
+                </div>
+                
+                <!-- Service 5 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hdd text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Service HDD/SSD</h3>
+                    <p class="text-gray-600">Perbaikan, cloning, dan recovery data dari harddisk atau SSD yang rusak.</p>
+                </div>
+                
+                <!-- Service 6 -->
+                <div class="service-card bg-gray-50 rounded-lg p-6 transition cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-laptop-medical text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Tune Up Laptop</h3>
+                    <p class="text-gray-600">Service menyeluruh mulai dari pembersihan, thermal paste, software optimization sampai hardware checkup.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Products Section -->
+    <section id="products" class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Produk Unggulan</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Berbagai laptop berkualitas dengan harga terbaik untuk kebutuhan Anda.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative group">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3b99b567-02df-478d-944f-771497845477.png" alt="Laptop gaming premium dengan layar 15.6 inch, keyboard RGB dan desain metalik" class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Lihat Detail</button>
+                        </div>
+                        <span class="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">BARU</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">ASUS ROG Strix G15</h3>
+                        <p class="text-gray-600 text-sm mb-3">Laptop Gaming RTX 3050, Ryzen 7, 16GB RAM, SSD 512GB</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp12.499.000</span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="1" 
+                                    data-name="ASUS ROG Strix G15" 
+                                    data-price="12499000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/37d637b0-2421-481b-a657-c5df701f0a42.png" alt="Laptop bisnis ultra tipis dengan layar sentuh berwarna silver dan chamfered edges" class="w-full h-48 object-cover">
+                        <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">DISKON</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">Lenovo ThinkPad X1 Carbon</h3>
+                        <p class="text-gray-600 text-sm mb-3">Ultralight Business Laptop, i7 11th Gen, 16GB RAM, SSD 1TB</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-gray-500 text-sm line-through mr-2">Rp18.999.000</span>
+                                <span class="text-blue-600 font-bold">Rp15.799.000</span>
+                            </div>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="2" 
+                                    data-name="Lenovo ThinkPad X1 Carbon" 
+                                    data-price="15799000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fbe0d555-b059-48b2-be34-c6d462ac046f.png" alt="Laptop kreator konten dengan layar 4K dan warna space gray dengan chassis aluminum" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">MacBook Pro M1 14"</h3>
+                        <p class="text-gray-600 text-sm mb-3">Chip M1 Pro, 16GB RAM, SSD 512GB, Liquid Retina XDR</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp22.999.000</span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="3" 
+                                    data-name="MacBook Pro M1 14" 
+                                    data-price="22999000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e59c223c-619a-4cea-ae9e-640d90707143.png" alt="Laptop 2-in-1 convertible dengan penyangga 360° dan stylus untuk kreativitas" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">HP Spectre x360</h3>
+                        <p class="text-gray-600 text-sm mb-3">Convertible Laptop, i7 12th Gen, 16GB RAM, OLED Touch 4K</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp19.499.000</span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="4" 
+                                    data-name="HP Spectre x360" 
+                                    data-price="19499000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 5 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bd8a9d88-dc81-47fe-bae5-e869abed0cf2.png" alt="Laptop gaming dengan desain futuristik dan ventilasi udara berwarna biru neon" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">MSI Katana GF76</h3>
+                        <p class="text-gray-600 text-sm mb-3">Laptop Gaming RTX 3060, i7 12th Gen, 32GB RAM, SSD 1TB</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp18.999.000</span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="5" 
+                                    data-name="MSI Katana GF76" 
+                                    data-price="18999000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 6 -->
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a94d890e-7723-4f39-a622-2579e923ef02.png" alt="Laptop bisnis entry-level dengan desain minimalis warna hitam dan keyboard ergonomis" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-2">Dell Vostro 3510</h3>
+                        <p class="text-gray-600 text-sm mb-3">Business Laptop, i5 11th Gen, 8GB RAM, SSD 256GB</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">Rp8.999.000</span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" 
+                                    data-id="6" 
+                                    data-name="Dell Vostro 3510" 
+                                    data-price="8999000">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Apa Kata Pelanggan?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Testimoni dari pelanggan yang puas dengan layanan dan produk kami.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimoni 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Budi Santoso</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star hover:text-yellow-300 cursor-pointer"></i>
+                                <i class="fas fa-star hover:text-yellow-300 cursor-pointer"></i>
+                                <i class="fas fa-star hover:text-yellow-300 cursor-pointer"></i>
+                                <i class="fas fa-star hover:text-yellow-300 cursor-pointer"></i>
+                                <i class="fas fa-star hover:text-yellow-300 cursor-pointer"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Laptop saya yang sering panas setelah discan ternyata masalah pada thermal paste dan kipas. Sekarang sudah normal kembali seperti baru, terima kasih Arip Software."</p>
+                </div>
+                
+                <!-- Testimoni 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Anita Wijaya</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Service layar laptop cepat dan hasilnya rapi. Harganya juga sesuai dengan kualitas pekerjaan. Rekomendasi untuk yang laptopnya rusak."</p>
+                </div>
+                
+                <!-- Testimoni 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Rudi Hartono</h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Beli MacBook Pro bekas dari Arip Software kondisi benar-benar seperti baru. Dilengkapi garansi juga jadi lebih tenang. Puas banget!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">Hubungi Kami</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Silakan hubungi kami untuk informasi lebih lanjut atau kunjungi workshop kami.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Informasi Kontak</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Alamat</p>
+                                <p class="text-gray-600">Jl. Teknologi No. 123, Kota Bandung, Jawa Barat</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone-alt text-blue-600 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Telepon</p>
+                                <p class="text-gray-600">(022) 1234 5678</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-blue-600 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Email</p>
+                                <p class="text-gray-600">info@aripsoftware.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-blue-600 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Jam Operasional</p>
+                                <p class="text-gray-600">Senin-Sabtu: 09:00 - 17:00 WIB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Kirim Pesan</h3>
+                    <form id="contact-form" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="name" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-gray-700 mb-1">Nomor HP</label>
+                            <input type="text" id="phone" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-700 mb-1">Pesan</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Kirim Pesan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Payment Modal -->
+    <div class="payment-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4" id="payment-modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Checkout Pembelian</h3>
+                <button id="close-payment-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div id="payment-items" class="divide-y"></div>
+                
+                <div class="flex justify-between items-center pt-3 border-t">
+                    <span class="font-bold">Total Pembayaran:</span>
+                    <span id="payment-total" class="font-bold text-blue-600">Rp0</span>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-1">Metode Pembayaran</label>
+                    <select id="payment-method" class="w-full px-4 py-2 border rounded-md">
+                        <option value="transfer">Transfer Bank</option>
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="cash">Bayar di Tempat</option>
+                        <option value="e-wallet">E-Wallet (OVO/DANA/GoPay)</option>
+                    </select>
+                </div>
+                
+                <div id="bank-info" class="bg-blue-50 p-4 rounded-md hidden">
+                    <h4 class="font-bold text-blue-800 mb-2">Transfer Bank</h4>
+                    <p class="text-sm text-blue-700 mb-1">Bank ABC - Arif Fadilah</p>
+                    <p class="text-sm text-blue-700">No. Rekening: 1234 5678 9012</p>
+                </div>
+                
+                <div id="cod-info" class="bg-blue-50 p-4 rounded-md hidden">
+                    <h4 class="font-bold text-blue-800 mb-2">Cash on Delivery</h4>
+                    <p class="text-sm text-blue-700">Bayar saat barang diterima. Mohon siapkan uang pas.</p>
+                </div>
+                
+                <div id="e-wallet-info" class="bg-blue-50 p-4 rounded-md hidden">
+                    <h4 class="font-bold text-blue-800 mb-2">E-Wallet</h4>
+                    <p class="text-sm text-blue-700 mb-1">OVO/DANA/GoPay - 0812 3456 7890</p>
+                    <p class="text-sm text-blue-700">Konfirmasi pembayaran via WhatsApp setelah transfer.</p>
+                </div>
+                
+                <button id="confirm-payment" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">Konfirmasi Pembayaran</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Confirmation -->
+    <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="order-confirmation">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil!</h3>
+            <p class="text-gray-600 mb-6">Terima kasih telah berbelanja di Arip Software. Kami akan segera memproses pesanan Anda.</p>
+            <button id="close-confirmation" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Tutup</button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between gap-8 mb-6">
+                <div class="md:w-1/3">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-laptop text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Arip Software</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Melayani berbagai jasa service elektronik dan penjualan laptop berkualitas sejak 2015.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/3">
+                    <h4 class="text-lg font-semibold mb-4">Tautan Cepat</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white transition">Layanan</a></li>
+                        <li><a href="#products" class="text-gray-400 hover:text-white transition">Produk</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-white transition">Testimoni</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Kontak</a></li>
+                    </ul>
+                </div>
+                
+                <div class="md:w-1/3">
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-3">Berlangganan untuk mendapatkan informasi promo dan tips perawatan laptop.</p>
+                    <form id="newsletter-form" class="flex">
+                        <input type="email" placeholder="Email Anda" class="px-4 py-2 rounded-l-md text-gray-800 w-full">
+                        <button type="submit" class="bg-blue-600 px-4 py-2 rounded-r-md hover:bg-blue-700 transition">
+                            <i class="fas fa-paper-plane text-white"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
+                <p>© 2023 Arip Software. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Smooth scroll function
+        function smoothScroll(target) {
+            document.getElementById(target).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Smooth scroll function
+        function smoothScroll(target) {
+            document.getElementById(target).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Shopping Cart Logic
+        let cart = [];
+        
+        // Toggle Mobile Menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking links
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+        
+        // Toggle Cart Dropdown
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartDropdown = document.getElementById('cart-dropdown');
+        
+        cartToggle.addEventListener('click', () => {
+            cartDropdown.classList.toggle('active');
+            mobileMenu.classList.add('hidden');
+            updateCartDisplay();
+        });
+        
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.getAttribute('data-id');
+                const name = e.target.getAttribute('data-name');
+                const price = parseInt(e.target.getAttribute('data-price'));
+                
+                // Check if item already in cart
+                const existingItem = cart.find(item => item.id === id);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        quantity: 1
+                    });
+                }
+                
+                // Update cart display
+                updateCartDisplay();
+                
+                // Show notification
+                alert(`${name} telah ditambahkan ke keranjang!`);
+            });
+        });
+        
+        // Update cart display
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const cartCount = document.getElementById('cart-count');
+            
+            // Clear previous items
+            cartItems.innerHTML = '';
+            
+            // Add current items
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'py-3 flex justify-between items-center';
+                itemElement.innerHTML = `
+                    <div>
+                        <h4 class="font-medium">${item.name}</h4>
+                        <div class="flex items-center mt-1">
+                            <button class="decrease-quantity bg-gray-100 px-2 py-1 rounded" data-id="${item.id}">-</button>
+                            <span class="quantity mx-2">${item.quantity}</span>
+                            <button class="increase-quantity bg-gray-100 px-2 py-1 rounded" data-id="${item.id}">+</button>
+                            <span class="text-blue-600 font-medium ml-4">Rp${itemTotal.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <button class="remove-item text-red-500 hover:text-red-700" data-id="${item.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                cartItems.appendChild(itemElement);
+            });
+            
+            // Update total and count
+            cartTotal.textContent = `Rp${total.toLocaleString()}`;
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Add event listeners for quantity buttons
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    const item = cart.find(item => item.id === id);
+                    if (item) {
+                        item.quantity += 1;
+                        updateCartDisplay();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    const itemIndex = cart.findIndex(item => item.id === id);
+                    if (itemIndex !== -1) {
+                        if (cart[itemIndex].quantity > 1) {
+                            cart[itemIndex].quantity -= 1;
+                        } else {
+                            cart.splice(itemIndex, 1);
+                        }
+                        updateCartDisplay();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').getAttribute('data-id');
+                    const itemIndex = cart.findIndex(item => item.id === id);
+                    if (itemIndex !== -1) {
+                        cart.splice(itemIndex, 1);
+                        updateCartDisplay();
+                    }
+                });
+            });
+        }
+        
+        // Checkout functionality
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Keranjang belanja Anda kosong!');
+                return;
+            }
+            
+            document.getElementById('cart-dropdown').classList.remove('active');
+            document.getElementById('payment-modal').classList.add('active');
+            
+            const paymentItems = document.getElementById('payment-items');
+            paymentItems.innerHTML = '';
+            
+            cart.forEach(item => {
+                const itemTotalPrice = item.price * item.quantity;
+                const itemElement = document.createElement('div');
+                itemElement.className = 'py-3 flex justify-between items-center';
+                itemElement.innerHTML = `
+                    <div>
+                        <h4 class="font-medium">${item.name} (${item.quantity}x)</h4>
+                    </div>
+                    <span class="text-gray-600">Rp${itemTotalPrice.toLocaleString()}</span>
+                `;
+                paymentItems.appendChild(itemElement);
+            });
+            
+            document.getElementById('payment-total').textContent = 
+                `Rp${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toLocaleString()}`;
+        });
+        
+        // Payment method selection
+        document.getElementById('payment-method').addEventListener('change', (e) => {
+            document.getElementById('bank-info').classList.add('hidden');
+            document.getElementById('cod-info').classList.add('hidden');
+            document.getElementById('e-wallet-info').classList.add('hidden');
+            
+            switch(e.target.value) {
+                case 'transfer':
+                    document.getElementById('bank-info').classList.remove('hidden');
+                    break;
+                case 'cod':
+                    document.getElementById('cod-info').classList.remove('hidden');
+                    break;
+                case 'e-wallet':
+                    document.getElementById('e-wallet-info').classList.remove('hidden');
+                    break;
+            }
+        });
+        
+        // Close payment modal
+        document.getElementById('close-payment-modal').addEventListener('click', () => {
+            document.getElementById('payment-modal').classList.remove('active');
+        });
+        
+        // Confirm payment
+        document.getElementById('confirm-payment').addEventListener('click', () => {
+            const paymentMethod = document.getElementById('payment-method').value;
+            const totalAmount = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            
+            // In a real application, you would process payment here
+            console.log(`Processing payment of Rp${totalAmount.toLocaleString()} via ${paymentMethod}`);
+            
+            // Show confirmation
+            document.getElementById('payment-modal').classList.remove('active');
+            document.getElementById('order-confirmation').classList.remove('hidden');
+            
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+        });
+        
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+            
+            if(name && email && phone && message) {
+                alert(`Terima kasih ${name}! Pesan Anda telah terkirim. Kami akan menghubungi Anda via ${phone} atau ${email}.`);
+                e.target.reset();
+            } else {
+                alert('Mohon lengkapi semua field terlebih dahulu!');
+            }
+        });
+
+        // Newsletter form submission
+        document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Terima kasih telah berlangganan newsletter kami!');
+            e.target.reset();
+        });
+
+        // Close confirmation
+        document.getElementById('close-confirmation').addEventListener('click', () => {
+            document.getElementById('order-confirmation').classList.add('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!cartToggle.contains(e.target) && !cartDropdown.contains(e.target) && 
+                e.target.id !== 'payment-modal' && !e.target.closest('#payment-modal')) {
+                cartDropdown.classList.remove('active');
+                document.getElementById('payment-modal').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
